@@ -1,73 +1,123 @@
-import { useEffect, useState } from "react";
-import { getPendingDeliveries, claimDelivery } from "../api/deliveries";
-import { toast } from "react-toastify";
+import React, { useEffect, useState } from 'react';
+import api from '../api/api';
 
-export default function DeliveryList({ user }) {
+const statuses = ['Pending', 'Accepted', 'In-Transit', 'Completed'];
+
+const DeliveryList = ({ user }) => {
   const [deliveries, setDeliveries] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState('Pending');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const fetchDeliveries = () => {
-    setLoading(true);
-    getPendingDeliveries()
-      .then((data) => {
-        setDeliveries(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  };
+const fetchDeliveries = async () => {
+  try {
+    let url = `/deliveries?createdBy=${user._id}`;
+    if (selectedStatus !== 'Pending') {
+      url += `&status=${selectedStatus}`;
+    } else {
+      url += `&status=Pending`;
+    }
+    
+    const res = await api.get(url, { withCredentials: true });
+    console.log("API Response:", res.data); 
+    setDeliveries(res.data);
+  } catch (err) {
+    console.error('Error fetching deliveries:', err);
+  }
+};
 
   useEffect(() => {
     fetchDeliveries();
-  }, []);
+  }, [selectedStatus, user._id]);
 
-  const handleClaim = async (deliveryId) => {
-    try {
-      await claimDelivery(deliveryId);
-      toast.success("Delivery claimed successfully!");
-      fetchDeliveries();
-    } catch (err) {
-      toast.error("Failed to claim delivery.");
-    }
-  };
-
-  if (loading) {
-    return <div className="text-center p-4">Loading...</div>;
-  }
-
-  if (!deliveries.length) {
+  const filteredDeliveries = deliveries.filter(delivery => {
+    const searchLower = searchTerm.toLowerCase();
     return (
-      <div className="flex flex-col items-center justify-center mt-10">
-        <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" />
-        </svg>
-        <p className="text-gray-500">No delivery requests available.</p>
-      </div>
+      delivery.pickupAddress.toLowerCase().includes(searchLower) ||
+      delivery.dropoffAddress.toLowerCase().includes(searchLower) ||
+      delivery.packageNote?.toLowerCase().includes(searchLower) ||
+      delivery._id.toLowerCase().includes(searchLower) ||
+      (delivery.acceptedBy?.name && delivery.acceptedBy.name.toLowerCase().includes(searchLower))
     );
-  }
+  });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 px-4">
-      {deliveries.map((delivery) => (
-        <div key={delivery._id} className="bg-white bg-opacity-90 rounded-lg shadow p-4">
-          <p className="mb-2 font-semibold text-gray-700">
-            {delivery.pickupAddress} &rarr; {delivery.dropoffAddress}
-          </p>
-          <p className="text-sm text-gray-600">
-            Package: {delivery.packageNote}
-          </p>
-          <p className="text-xs text-gray-400 mt-2">
-            Requested {new Date(delivery.createdAt).toLocaleString()}
-          </p>
-          {user?.role === "driver" && (
-            <button
-              className="mt-3 w-full bg-blue-600 text-white py-1 rounded hover:bg-blue-700 transition"
-              onClick={() => handleClaim(delivery._id)}
-            >
-              Claim Delivery
-            </button>
-          )}
+    <div className="p-6 w-full">
+      <h2 className="text-2xl font-bold mb-4">Your Delivery Requests</h2>
+
+      <input
+        type="text"
+        placeholder="Search deliveries by address, name, or ID..."
+        className="w-full p-2 mb-4 border rounded"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      <div className="flex space-x-2 mb-4 overflow-x-auto pb-2">
+        {statuses.map(status => (
+          <button
+            key={status}
+            onClick={() => setSelectedStatus(status)}
+            className={`px-4 py-2 rounded whitespace-nowrap ${
+              selectedStatus === status ? 'bg-blue-600 text-white' : 'bg-gray-200'
+            }`}
+          >
+            {status}
+          </button>
+        ))}
+      </div>
+
+      {filteredDeliveries.length === 0 ? (
+        <div className="bg-white p-4 rounded shadow">
+          <p>No {selectedStatus.toLowerCase()} delivery requests found.</p>
         </div>
-      ))}
+      ) : (
+        <div className="space-y-4">
+          {filteredDeliveries.map(delivery => (
+            <div key={delivery._id} className="bg-white shadow p-4 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Delivery Details</h3>
+                  <p><strong>Pickup:</strong> {delivery.pickupAddress}</p>
+                  <p><strong>Dropoff:</strong> {delivery.dropoffAddress}</p>
+                  <p><strong>Note:</strong> {delivery.packageNote || 'None'}</p>
+                  <p><strong>Status:</strong> <span className={`px-2 py-1 rounded text-xs ${
+                    delivery.status === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                    delivery.status === 'Accepted' ? 'bg-blue-100 text-blue-800' :
+                    delivery.status === 'In-Transit' ? 'bg-purple-100 text-purple-800' :
+                    'bg-green-100 text-green-800'
+                  }`}>{delivery.status}</span></p>
+                  <p><strong>Created:</strong> {new Date(delivery.createdAt).toLocaleString()}</p>
+                </div>
+                
+                {(selectedStatus !== 'Pending' && delivery.acceptedBy) && (
+                  <div>
+                    <h3 className="font-bold text-lg mb-2">Driver Details</h3>
+                    <p><strong>Name:</strong> {delivery.acceptedBy.name}</p>
+                    <p><strong>Email:</strong> {delivery.acceptedBy.email}</p>
+                    <p><strong>Accepted At:</strong> {delivery.acceptedAt ? new Date(delivery.acceptedAt).toLocaleString() : 'N/A'}</p>
+                    {delivery.completedAt && (
+                      <p><strong>Completed At:</strong> {new Date(delivery.completedAt).toLocaleString()}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              {delivery.itemImage && (
+                <div className="mt-4">
+                  <p className="font-bold mb-2">Item Image:</p>
+                  <img
+                    src={`http://localhost:5000/uploads/deliveries/${delivery.itemImage}`}
+                    alt="Item for delivery"
+                    className="w-32 h-32 object-cover rounded border"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default DeliveryList;

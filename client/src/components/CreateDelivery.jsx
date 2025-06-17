@@ -1,64 +1,83 @@
-import { useState } from "react";
-import { createDelivery } from "../api/deliveries";
+import React, { useState } from 'react';
+import api from '../api/api';
 
-export default function CreateDelivery({ onCreated }) {
-  const [form, setForm] = useState({
-    pickupAddress: "",
-    dropoffAddress: "",
-    packageNote: "",
+const CreateDelivery = ({ onClose }) => {
+  const [formData, setFormData] = useState({
+    pickupAddress: '',
+    dropoffAddress: '',
+    packageNote: ''
   });
-  const [msg, setMsg] = useState("");
+  const [file, setFile] = useState(null);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMsg("");
-    try {
-      await createDelivery(form);
-      setMsg("Delivery created successfully!");
-      setForm({ pickupAddress: "", dropoffAddress: "", packageNote: "" });
-      onCreated && onCreated();
-    } catch (err) {
-      setMsg("Error creating delivery.");
-    }
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = e => {
+    setFile(e.target.files[0]);
+  };
+
+const handleSubmit = async e => {
+  e.preventDefault();
+  const data = new FormData();
+  Object.entries(formData).forEach(([key, value]) => data.append(key, value));
+  if (file) data.append('itemImage', file);
+
+  try {
+    await api.post('/deliveries', data, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      withCredentials: true
+    });
+    alert('Delivery created successfully');
+    if (typeof onClose === 'function') {
+      onClose(); 
+    }
+  } catch (err) {
+    console.error(err);
+    alert('Failed to create delivery');
+  }
+};
+
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mb-8 bg-white bg-opacity-90 rounded-xl shadow-lg backdrop-blur-md p-6">
-      <h2 className="text-lg font-bold mb-4 text-center">Create Delivery Request</h2>
+    <form onSubmit={handleSubmit} className="space-y-4">
       <input
-        className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
         name="pickupAddress"
+        value={formData.pickupAddress}
+        onChange={handleChange}
         placeholder="Pickup Address"
-        value={form.pickupAddress}
-        onChange={handleChange}
         required
+        className="w-full p-2 border rounded"
       />
       <input
-        className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
         name="dropoffAddress"
+        value={formData.dropoffAddress}
+        onChange={handleChange}
         placeholder="Dropoff Address"
-        value={form.dropoffAddress}
-        onChange={handleChange}
         required
+        className="w-full p-2 border rounded"
       />
-      <input
-        className="w-full mb-4 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+      <textarea
         name="packageNote"
-        placeholder="Package Note"
-        value={form.packageNote}
+        value={formData.packageNote}
         onChange={handleChange}
+        placeholder="Any special notes for delivery"
         required
+        className="w-full p-2 border rounded"
       />
+      <div>
+        <label className="block mb-1">Upload Item Photo (optional):</label>
+        <input type="file" onChange={handleFileChange} />
+      </div>
       <button
-        className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white py-2 rounded shadow hover:from-green-600 hover:to-green-800 transition font-semibold"
         type="submit"
+        className="w-full bg-blue-600 text-white p-2 rounded"
       >
-        Create
+        Submit Delivery Request
       </button>
-      {msg && <div className="mt-2 text-center text-sm text-green-700">{msg}</div>}
     </form>
   );
-}
+};
+
+export default CreateDelivery;

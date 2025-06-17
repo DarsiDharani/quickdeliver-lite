@@ -1,7 +1,7 @@
 import { Carousel } from "react-responsive-carousel";
 import { Link } from "react-router-dom";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Footer from "../components/Footer"; // Adjust path as needed
+import Footer from "../components/Footer"; 
 
 const slides = [
   {

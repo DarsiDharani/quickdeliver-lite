@@ -1,22 +1,44 @@
 const mongoose = require('mongoose');
 
 const deliverySchema = new mongoose.Schema({
-  pickupAddress: String,
-  dropoffAddress: String,
-  packageNote: String,
+  pickupAddress: {
+    type: String,
+    required: true
+  },
+  dropoffAddress: {
+    type: String,
+    required: true
+  },
+  packageNote: {
+    type: String,
+    required: true
+  },
   status: {
     type: String,
-    enum: ['pending', 'claimed', 'completed'],
-    default: 'pending'
+    enum: ['Pending', 'Accepted', 'In-Transit', 'Completed'],
+    default: 'Pending'
   },
-  claimedBy: {
+  itemImage: {
+    type: String 
+  },
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: null
+    ref: 'User', 
+    required: true
+  },
+  acceptedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User' 
   },
   createdAt: {
     type: Date,
     default: Date.now
+  },
+   acceptedAt: {
+    type: Date
+  },
+  completedAt: {
+    type: Date
   }
 });
 
