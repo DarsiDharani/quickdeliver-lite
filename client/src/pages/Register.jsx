@@ -17,25 +17,27 @@ export default function Register({ setUser }) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    const { name, email, password, role } = form;
+  const { name, email, password, role } = form;
 
-    if (password.length < 8) {
-      return setError("Password must be at least 8 characters long.");
-    }
+  if (password.length < 8) {
+    return setError("Password must be at least 8 characters long.");
+  }
 
-    try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", form);
-      localStorage.setItem("token", res.data.token);
-      setUser(res.data.user);
-      navigate("/dashboard");
-    } catch (err) {
-      setError(err.response?.data?.error || "Registration failed");
-    }
-  };
+  try {
+    const res = await axios.post("http://localhost:5000/api/auth/register", form, {
+      withCredentials: true
+    });
+
+    setUser(res.data.user);  
+    navigate("/dashboard");
+  } catch (err) {
+    setError(err.response?.data?.error || "Registration failed");
+  }
+};
 
   return (
     <div
