@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Navbar({ user, onLogout }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
 
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-500 to-pink-500 shadow-lg">
@@ -45,7 +47,7 @@ export default function Navbar({ user, onLogout }) {
               strokeLinecap="round"
               strokeLinejoin="round"
               d={
-                isOpen
+                isMenuOpen
                   ? "M6 18L18 6M6 6l12 12"
                   : "M4 6h16M4 12h16M4 18h16"
               }
@@ -56,7 +58,7 @@ export default function Navbar({ user, onLogout }) {
         {/* Navigation Links */}
         <div
           className={`flex-col md:flex-row md:flex ${
-            isOpen ? "flex" : "hidden"
+            isMenuOpen ? "flex" : "hidden"
           } md:items-center md:space-x-6 w-full md:w-auto md:static absolute top-full left-0 bg-black md:bg-transparent px-6 py-4 md:py-0`}
         >
           <Link
@@ -90,19 +92,82 @@ export default function Navbar({ user, onLogout }) {
           )}
 
           {user && (
-            <div className="flex flex-col md:flex-row md:items-center">
-              <span className="text-yellow-100 text-sm font-medium py-2">
-                Hi, {user.name}
-              </span>
+            <>
+              {/* Profile Dropdown Trigger */}
+              <div className="relative flex items-center">
+                <div 
+                  className="flex items-center space-x-2 cursor-pointer"
+                  onClick={toggleProfile}
+                >
+                  <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center overflow-hidden">
+                    {user.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-indigo-600 font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-yellow-100 text-sm font-medium">
+                    {user.name}
+                  </span>
+                </div>
+
+                {/* Profile Dropdown */}
+                {isProfileOpen && (
+                  <div className="md:absolute md:right-0 md:top-full mt-0 md:mt-2 w-full md:w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-gray-800 hover:bg-indigo-100 transition"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/settings"
+                      className="block px-4 py-2 text-gray-800 hover:bg-indigo-100 transition"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      Settings
+                    </Link>
+                    <Link
+                      to="/orders"
+                      className="block px-4 py-2 text-gray-800 hover:bg-indigo-100 transition"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      My Orders
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Logout Button (always visible) */}
               {onLogout && (
                 <button
-                  onClick={onLogout}
+                  onClick={() => {
+                    onLogout();
+                    setIsProfileOpen(false);
+                    setIsMenuOpen(false);
+                  }}
                   className="ml-0 md:ml-2 px-4 py-1 bg-red-500 hover:bg-red-600 text-white rounded-full font-semibold shadow transition"
                 >
                   Logout
                 </button>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
