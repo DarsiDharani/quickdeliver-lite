@@ -13,15 +13,21 @@ import api from "./api/api";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Static pages
+import About from "./pages/Static/About";
+import PrivacyPolicy from "./pages/Static/PrivacyPolicy";
+import Licensing from "./pages/Static/Licensing";
+import Contact from "./pages/Static/Contact";
+
 export default function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading while checking auth
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await api.get("/auth/me");
-        setUser(res.data.user); 
+        setUser(res.data.user);
       } catch (err) {
         console.log("❌ Not logged in");
         setUser(null);
@@ -38,7 +44,6 @@ export default function App() {
     setUser(null);
   };
 
-  // Show loading until auth check is done
   if (loading) return <div className="text-center mt-10 text-lg">Loading...</div>;
 
   return (
@@ -49,16 +54,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<Register setUser={setUser} />} />
-          <Route 
-              path="/profile" 
-              element={
-                <Profile 
-                  user={user} 
-                  onLogout={handleLogout} 
-                />
-              } 
-            />
-          {/* Protected dashboard logic */}
+          <Route path="/profile" element={<Profile user={user} onLogout={handleLogout} />} />
           <Route
             path="/dashboard"
             element={
@@ -72,7 +68,13 @@ export default function App() {
             }
           />
 
-          {/* Fallback route */}
+          {/* Static Pages */}
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/licensing" element={<Licensing />} />
+          <Route path="/contact" element={<Contact />} />
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
