@@ -9,13 +9,16 @@ const userSchema = new mongoose.Schema({
     unique: true,
     match: /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/
   },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['customer', 'driver'], required: true }
+  password: { type: String },
+  role: { type: String, enum: ['customer', 'driver'], required: true, default: "customer" },
+  googleId: { type: String }  // ✅ NEW
 });
 
+// Only hash password if it's present (for email/password users)
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
+  if (this.password && this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
   next();
 });
 

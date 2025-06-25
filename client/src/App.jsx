@@ -19,6 +19,9 @@ import PrivacyPolicy from "./pages/Static/PrivacyPolicy";
 import Licensing from "./pages/Static/Licensing";
 import Contact from "./pages/Static/Contact";
 
+// ✅ Google Success Page
+import GoogleSuccess from "./pages/GoogleSuccess";
+
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +47,8 @@ export default function App() {
     setUser(null);
   };
 
-  if (loading) return <div className="text-center mt-10 text-lg">Loading...</div>;
+  if (loading)
+    return <div className="text-center mt-10 text-lg">Loading...</div>;
 
   return (
     <BrowserRouter>
@@ -54,7 +58,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login setUser={setUser} />} />
           <Route path="/register" element={<Register setUser={setUser} />} />
-          <Route path="/profile" element={<Profile user={user} onLogout={handleLogout} />} />
+          <Route
+            path="/profile"
+            element={<Profile user={user} onLogout={handleLogout} />}
+          />
           <Route
             path="/dashboard"
             element={
@@ -66,6 +73,12 @@ export default function App() {
                 )}
               </ProtectedRoute>
             }
+          />
+
+          {/* ✅ Google OAuth Redirect Handler */}
+          <Route
+            path="/google-success"
+            element={<GoogleSuccess setUser={setUser} />}
           />
 
           {/* Static Pages */}

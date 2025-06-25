@@ -35,6 +35,10 @@ export default function Login({ setUser }) {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:5000/api/auth/google";
+  };
+
   return (
     <div
       className="flex items-center justify-center min-h-screen bg-gray-100 relative"
@@ -47,11 +51,14 @@ export default function Login({ setUser }) {
       }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
       <form
         className="relative bg-white bg-opacity-90 p-8 rounded-lg shadow-md w-full max-w-sm z-10"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center text-indigo-700">Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-indigo-700">
+          Login
+        </h2>
 
         <input
           className="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -78,6 +85,14 @@ export default function Login({ setUser }) {
           type="submit"
         >
           Login
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full mt-3 bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
+        >
+          Login with Google
         </button>
 
         <div className="mt-4 text-center text-sm">
