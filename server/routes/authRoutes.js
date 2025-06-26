@@ -97,7 +97,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get(
   '/google/callback',
   passport.authenticate('google', {
-    failureRedirect: 'http://localhost:5173/login',
+    failureRedirect: 'https://quickdeliverlite.vercel.app/login',
     session: true,
   }),
   (req, res) => {
@@ -118,10 +118,10 @@ router.get(
       });
 
       // Successful redirect
-      res.redirect('http://localhost:5173/google-success');
+      res.redirect('https://quickdeliverlite.vercel.app/google-success');
     } catch (err) {
       console.error('JWT Error:', err);
-      res.redirect('http://localhost:5173/login?error=jwt_error');
+      res.redirect('https://quickdeliverlite.vercel.app/login?error=jwt_error');
     }
   }
 );

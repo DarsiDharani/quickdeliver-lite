@@ -16,7 +16,11 @@ const app = express();
 connectDB();
 
 // CORS Configuration - Do this before other middleware
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://quickdeliverlite.vercel.app'
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
