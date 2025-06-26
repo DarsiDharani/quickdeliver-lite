@@ -147,6 +147,18 @@ const DeliveryCard = ({
           </button>
         )}
       </div>
+        {delivery.status === "Completed" && delivery.feedback && (
+  <div className="mt-4 border-t pt-3 text-sm text-gray-700">
+    <h4 className="font-semibold text-gray-800 mb-1">Customer Feedback</h4>
+    <p><strong>Rating:</strong> {delivery.feedback.rating} ⭐</p>
+    {delivery.feedback.comment && (
+      <p><strong>Comment:</strong> {delivery.feedback.comment}</p>
+    )}
+    <p className="text-xs text-gray-500 mt-1">
+      Submitted on: {new Date(delivery.feedback.createdAt).toLocaleDateString()}
+    </p>
+  </div>
+)}
 
       {showConfirmation && (
         <ConfirmationModal

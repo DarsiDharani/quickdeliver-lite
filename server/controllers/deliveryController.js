@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const Delivery = require('../models/Delivery');
 const nodemailer = require('nodemailer');
@@ -143,6 +142,46 @@ exports.getDeliveriesByStatus = async (req, res) => {
   }
 };
 
+// Cancel a delivery
+exports.cancelDelivery = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Debug logging
+    console.log(`Cancelling delivery ${id} for user ${req.user._id}`);
+    
+    const delivery = await Delivery.findOneAndDelete({
+      _id: id,
+      createdBy: req.user._id,
+      status: { $in: ['Pending', 'Accepted'] }
+    });
+
+    if (!delivery) {
+      console.warn(`Delivery not found or not cancellable: ${id}`);
+      return res.status(404).json({
+        success: false,
+        message: 'Delivery not found or cannot be cancelled'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Delivery cancelled successfully',
+      cancelledDelivery: delivery
+    });
+  } catch (err) {
+    console.error('Cancellation error:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error during cancellation',
+      error: err.message
+    });
+  }
+};
+
+// Add this to your controllers/deliveryController.js
+
+
 // Accept a delivery
 exports.acceptDelivery = async (req, res) => {
   try {
@@ -177,6 +216,66 @@ exports.acceptDelivery = async (req, res) => {
       success: false,
       message: 'Server error',
       error: err.message 
+    });
+  }
+};
+// Submit feedback for a completed delivery
+exports.submitFeedback = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    const userId = req.user._id;
+
+    // Validate input
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid rating (1-5)'
+      });
+    }
+
+    // Find the delivery
+    const delivery = await Delivery.findOne({
+      _id: id,
+      createdBy: userId,
+      status: 'Completed'
+    });
+
+    if (!delivery) {
+      return res.status(404).json({
+        success: false,
+        message: 'Delivery not found or not eligible for feedback'
+      });
+    }
+
+    // Check if feedback already exists
+    if (delivery.feedback) {
+      return res.status(400).json({
+        success: false,
+        message: 'Feedback already submitted for this delivery'
+      });
+    }
+
+    // Add feedback
+    delivery.feedback = {
+      rating,
+      comment: comment || undefined, // Only set if comment exists
+      createdAt: new Date()
+    };
+
+    await delivery.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Feedback submitted successfully',
+      delivery
+    });
+  } catch (err) {
+    console.error('Error submitting feedback:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: err.message
     });
   }
 };
