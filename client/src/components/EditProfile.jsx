@@ -35,7 +35,7 @@ export default function EditProfile({ user, setUser }) {
 
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/auth/update-profile",
+        "https://quickdeliver-lite.onrender.com/api/auth/update-profile",
         form,
         { withCredentials: true }
       );

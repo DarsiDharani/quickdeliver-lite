@@ -85,7 +85,7 @@ const DeliveryDetailsModal = ({
                   <img
                     src={
                       delivery.itemImage
-                        ? `http://localhost:5000/uploads/deliveries/${delivery.itemImage}`
+                        ? `https://quickdeliver-lite.onrender.com/uploads/deliveries/${delivery.itemImage}`
                         : "/default-box.png"
                     }
                     alt="Item"

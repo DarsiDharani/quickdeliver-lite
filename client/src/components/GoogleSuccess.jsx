@@ -9,7 +9,7 @@ export default function GoogleSuccess({ setUser }) {
     const verifyAuth = async () => {
       try {
         // First try to get user from /me endpoint
-        const { data } = await axios.get("http://localhost:5000/api/auth/me", {
+        const { data } = await axios.get("https://quickdeliver-lite.onrender.com/api/auth/me", {
           withCredentials: true,
         });
 

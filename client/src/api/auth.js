@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function login(email, password) {
   const res = await axios.post(
-    "http://localhost:5000/api/auth/login",
+    "https://quickdeliver-lite.onrender.com/api/auth/login",
     { email, password },
     { withCredentials: true }
   );
@@ -11,7 +11,7 @@ export async function login(email, password) {
 
 export async function register({ name, email, password,phone, role }) {
   const res = await axios.post(
-    "http://localhost:5000/api/auth/register",
+    "https://quickdeliver-lite.onrender.com/api/auth/register",
     { name, email, password,phone, role },
     { withCredentials: true }
   );
@@ -19,5 +19,5 @@ export async function register({ name, email, password,phone, role }) {
 }
 
 export async function logout() {
-  await axios.post("http://localhost:5000/api/auth/logout", {}, { withCredentials: true });
+  await axios.post("https://quickdeliver-lite.onrender.com/api/auth/logout", {}, { withCredentials: true });
 }

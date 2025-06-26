@@ -8,7 +8,7 @@ export default function GoogleSuccess({ setUser }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
+        const res = await axios.get("https://quickdeliver-lite.onrender.com/api/auth/me", {
           withCredentials: true,
         });
 

@@ -12,7 +12,7 @@ export default function Profile({ user, onLogout }) {
     } else {
       // Fetch order count
       axios
-        .get("http://localhost:5000/api/auth/profile", { withCredentials: true })
+        .get("https://quickdeliver-lite.onrender.com/api/auth/profile", { withCredentials: true })
         .then((res) => {
           setOrderCount(res.data.deliveryCount || 0);
         })
