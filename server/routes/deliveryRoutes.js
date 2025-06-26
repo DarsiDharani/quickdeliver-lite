@@ -13,6 +13,7 @@ const {
   updateDeliveryStatus,
   submitFeedback,
   getDeliveriesByStatus,
+  sendDeliveryOtp,
   cancelDelivery
 } = require('../controllers/deliveryController');
 console.log('Route debug - submitFeedback:', typeof submitFeedback);
@@ -48,6 +49,7 @@ router.get('/pending', authenticate, getPendingDeliveries);
 router.patch('/:id/accept', authenticate, acceptDelivery);
 router.patch('/:id/status', authenticate, updateDeliveryStatus);
 router.get('/status/:status', authenticate, getDeliveriesByStatus);
+router.post('/:id/send-otp', authenticate, sendDeliveryOtp);
 
 console.log('Route debug - submitFeedback:', typeof submitFeedback);
 console.log('All imported functions:', {

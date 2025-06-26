@@ -59,7 +59,11 @@ const deliverySchema = new mongoose.Schema({
   },
   feedback: {
     type: feedbackSchema
-  }
+  },
+  otp: {
+  code: String,
+  expiresAt: Date
+}
 });
 
 module.exports = mongoose.model('Delivery', deliverySchema);
